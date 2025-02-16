@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Minesweeper FHEVM</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+      }
+      #board {
+        display: grid;
+        gap: 2px;
+        margin-top: 20px;
+      }
+      .cell {
+        width: 30px;
+        height: 30px;
+        border: 1px solid #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        user-select: none;
+        font-size: 12px;
+      }
+      .hidden {
+        background-color: #ccc;
+      }
+      .mine {
+        background-color: #f00;
+      }
+      .revealed {
+        background-color: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Minesweeper FHEVM</h1>
+    <button id="connectButton">Connect Wallet</button>
+    <button id="deployButton" style="display: none">New Match (Deploy Contract)</button>
+    <p id="accountArea"></p>
+    <div id="board"></div>
+    <script src="./src/main.js"></script>
+  </body>
+</html>
