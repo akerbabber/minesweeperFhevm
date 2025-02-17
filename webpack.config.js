@@ -1,9 +1,9 @@
 const path = require("path");
 
 module.exports = {
-  entry: "./src/main.ts", // corrected entry path relative to the frontend folder
+  entry: "./frontend/src/main.ts", // correct entry path relative to project root
   output: {
-    path: path.resolve(__dirname, "dist"),
+    path: path.resolve(__dirname, "frontend/dist"),
     filename: "main.js",
   },
   resolve: {

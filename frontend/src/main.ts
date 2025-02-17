@@ -1,6 +1,6 @@
 import { Web3Provider } from "@ethersproject/providers";
 import { ethers } from "ethers";
-import { createInstance } from "fhevmjs/node";
+import { createInstance, initFhevm } from "fhevmjs";
 
 import contractArtifact from "../../artifacts/contracts/Minesweeper.sol/Minesweeper.json";
 
@@ -11,12 +11,13 @@ declare global {
 }
 
 const createFhevmInstance = async () => {
+  await initFhevm();
   return createInstance({
     chainId: 11155111, // Sepolia chain ID
     networkUrl: "https://eth-sepolia.public.blastapi.io", // Sepolia RPC URL
     gatewayUrl: "https://gateway.sepolia.zama.ai",
-    kmsContractAddress: "0x9D6891A6240D6130c54ae243d8005063D05fE14b";
-    aclContractAddress: "0xFee8407e2f5e3Ee68ad77cAE98c434e637f516e5";
+    kmsContractAddress: "0x9D6891A6240D6130c54ae243d8005063D05fE14b",
+    aclContractAddress: "0xFee8407e2f5e3Ee68ad77cAE98c434e637f516e5",
   });
 };
 createFhevmInstance().then((instance) => {

@@ -53,8 +53,10 @@ contract Minesweeper is SepoliaZamaFHEVMConfig, SepoliaZamaGatewayConfig, Gatewa
         uint8 index = getIndex(row, col);
         // Check if the cell is mined
         ebool hiddenCell = TFHE.asEbool(TFHE.shr(TFHE.shl(hiddenBoard, index), 255));
+        TFHE.allowThis(hiddenCell);
         euint8 hiddenSurroundingCells = getSurroundingCells(row, col);
         euint8 numberOfSurroundingMines = getNumberSurroundingMines(hiddenSurroundingCells);
+        TFHE.allowThis(numberOfSurroundingMines);
         uint256[] memory cts = new uint256[](2);
         cts[0] = Gateway.toUint256(hiddenCell);
         cts[1] = Gateway.toUint256(numberOfSurroundingMines);
@@ -62,7 +64,7 @@ contract Minesweeper is SepoliaZamaFHEVMConfig, SepoliaZamaGatewayConfig, Gatewa
             cts,
             this.pickMineCallback.selector,
             0,
-            block.timestamp + 100,
+            block.timestamp + 1000,
             false
         );
         addParamsUint256(requestID, uint(row));
@@ -84,13 +86,13 @@ contract Minesweeper is SepoliaZamaFHEVMConfig, SepoliaZamaGatewayConfig, Gatewa
             if (decryptedNumberOfSurroundingMines == 0) {
                 // Pick surrounding cells
                 board[row][col] = Cell.empty;
-                for (uint i = 0; i < 8; i++) {
-                    int8 newRow = int8(uint8(row)) + [-1, -1, -1, 0, 0, 1, 1, 1][i];
-                    int8 newCol = int8(uint8(col)) + [-1, 0, 1, -1, 1, -1, 0, 1][i];
-                    if (newRow >= 0 && newRow < 16 && newCol >= 0 && newCol < 16) {
-                        pickMine(uint8(newRow), uint8(newCol));
-                    }
-                }
+                // for (uint i = 0; i < 8; i++) {
+                //     int8 newRow = int8(uint8(row)) + [-1, -1, -1, 0, 0, 1, 1, 1][i];
+                //     int8 newCol = int8(uint8(col)) + [-1, 0, 1, -1, 1, -1, 0, 1][i];
+                //     if (newRow >= 0 && newRow < 16 && newCol >= 0 && newCol < 16) {
+                //         pickMine(uint8(newRow), uint8(newCol));
+                //     }
+                // }
             } else {
                 if (decryptedNumberOfSurroundingMines == 1) board[row][col] = Cell.one;
                 else if (decryptedNumberOfSurroundingMines == 2) board[row][col] = Cell.two;
