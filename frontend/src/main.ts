@@ -50,7 +50,7 @@ connectButton.onclick = async () => {
 deployButton.onclick = async () => {
   const factory = new ethers.ContractFactory(abi, bytecode).connect(signer);
   contract = (await (await factory.deploy()).waitForDeployment()) as Contract;
-  // contract = new Contract("0xcef6dbb0035e834c604b9e75a3e841336c3f1f17", abi, signer);
+  // contract = new Contract("0x6eE276EA5763214c9E117A99e5eF97f8c4025415", abi, signer);
   deployButton.style.display = "none";
   initBoard();
 };

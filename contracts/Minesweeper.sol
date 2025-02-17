@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
 import "fhevm/lib/TFHE.sol";
@@ -5,6 +6,11 @@ import { SepoliaZamaFHEVMConfig } from "fhevm/config/ZamaFHEVMConfig.sol";
 import { SepoliaZamaGatewayConfig } from "fhevm/config/ZamaGatewayConfig.sol";
 import "fhevm/gateway/GatewayCaller.sol";
 
+/**
+ * @title Minesweeper
+ * @notice A decentralized Minesweeper game where operations on encrypted data are performed using fhevm.
+ * @dev The contract uses TFHE for fully homomorphic encryption and integrates authorization with an onlyPlayer modifier.
+ */
 contract Minesweeper is SepoliaZamaFHEVMConfig, SepoliaZamaGatewayConfig, GatewayCaller {
     euint256 hiddenBoard;
     enum Cell {
@@ -33,11 +39,26 @@ contract Minesweeper is SepoliaZamaFHEVMConfig, SepoliaZamaGatewayConfig, Gatewa
     // Game state
     GameState public state;
 
+    address public immutable player;
+
+    modifier onlyPlayer() {
+        require(msg.sender == player, "Not authorized");
+        _;
+    }
+
+    /**
+     * @notice Constructs the Minesweeper contract and sets the deployer as the player.
+     */
     constructor() {
+        player = msg.sender;
         // Initialize the board
         generateBoard();
     }
 
+    /**
+     * @notice Generates a new random encrypted game board.
+     * @dev Combines two random 256-bit numbers using AND to reduce mine probability.
+     */
     function generateBoard() public {
         // Generate a random board by using AND operation to lower the probability of mines
         euint256 firstGen = TFHE.randEuint256();
@@ -46,8 +67,13 @@ contract Minesweeper is SepoliaZamaFHEVMConfig, SepoliaZamaGatewayConfig, Gatewa
         TFHE.allowThis(hiddenBoard);
     }
 
-    // New helper function to check if a cell is mined using TFHE operations.
-    function pickMine(uint8 row, uint8 col) public {
+    /**
+     * @notice Allows the authorized player to reveal a cell.
+     * @param row The row index of the cell.
+     * @param col The column index of the cell.
+     * @dev Calls Gateway.requestDecryption to determine if the cell is mined and the count of surrounding mines.
+     */
+    function pickMine(uint8 row, uint8 col) public onlyPlayer {
         // Check if the cell is not already revealed
         if (board[row][col] != Cell.hidden) {
             return;
@@ -73,6 +99,13 @@ contract Minesweeper is SepoliaZamaFHEVMConfig, SepoliaZamaGatewayConfig, Gatewa
         addParamsUint256(requestID, uint(col));
     }
 
+    /**
+     * @notice Callback function from the gateway after decryption.
+     * @param requestId The identifier of the decryption request.
+     * @param decryptedCell The result indicating if the cell was mined.
+     * @param decryptedNumberOfSurroundingMines The decrypted count of surrounding mines.
+     * @dev Updates the board and game state based on the decryption results.
+     */
     function pickMineCallback(
         uint requestId,
         bool decryptedCell,
@@ -108,10 +141,23 @@ contract Minesweeper is SepoliaZamaFHEVMConfig, SepoliaZamaGatewayConfig, Gatewa
         }
     }
 
+    /**
+     * @notice Calculates the one-dimensional index from 2D board coordinates.
+     * @param row The row index.
+     * @param col The column index.
+     * @return The computed index.
+     */
     function getIndex(uint8 row, uint8 col) public pure returns (uint8) {
         return row * 16 + col;
     }
 
+    /**
+     * @notice Retrieves encrypted values of neighboring cells.
+     * @param row The row index of the target cell.
+     * @param col The column index of the target cell.
+     * @return An encrypted uint8 representing neighboring cells bits.
+     * @dev Iterates through all 8 neighbors using relative offsets.
+     */
     function getSurroundingCells(uint8 row, uint8 col) internal returns (euint8) {
         // Initialize encrypted result as 0 (pseudo-code; adjust with actual TFHE method)
         euint8 surroundingCells = TFHE.asEuint8(0);
@@ -138,6 +184,11 @@ contract Minesweeper is SepoliaZamaFHEVMConfig, SepoliaZamaGatewayConfig, Gatewa
         return surroundingCells;
     }
 
+    /**
+     * @notice Sums the bits that indicate mines in the surrounding cells.
+     * @param surroundingCells The encrypted representation of surrounding cells.
+     * @return The encrypted count of surrounding mines.
+     */
     function getNumberSurroundingMines(euint8 surroundingCells) internal returns (euint8) {
         // Initialize encrypted result as 0
         euint8 numberOfSurroundingMines = TFHE.asEuint8(0);
@@ -149,6 +200,10 @@ contract Minesweeper is SepoliaZamaFHEVMConfig, SepoliaZamaGatewayConfig, Gatewa
         return numberOfSurroundingMines;
     }
 
+    /**
+     * @notice Retrieves the current state of the game board.
+     * @return The 16x16 board array.
+     */
     function getBoard() public view returns (Cell[16][16] memory) {
         return board;
     }

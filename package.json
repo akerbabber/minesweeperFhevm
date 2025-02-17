@@ -85,7 +85,6 @@
     "access": "public"
   },
   "scripts": {
-    "build": "node build-esbuild.js",
     "clean": "rimraf ./artifacts ./cache ./coverage ./types ./coverage.json && pnpm typechain",
     "compile": "cross-env TS_NODE_TRANSPILE_ONLY=true hardhat compile",
     "lint": "pnpm lint:sol && pnpm lint:ts && pnpm prettier:check",
@@ -95,11 +94,10 @@
     "prettier:check": "prettier --check \"**/*.{js,json,md,sol,ts,yml}\"",
     "prettier:write": "prettier --write \"**/*.{js,json,md,sol,ts,yml}\"",
     "typechain": "cross-env TS_NODE_TRANSPILE_ONLY=true hardhat typechain",
-    "test": "hardhat test --network hardhat",
-    "coverage": "hardhat coverage",
-    "deploy-sepolia": "hardhat deploy --network sepolia",
-    "mint-sepolia": "hardhat mint --amount 42 --network sepolia",
-    "webpack": "webpack"
+    "build:frontend": "cd ./frontend && npx webpack --config webpack.config.js",
+    "build:contracts": "npm run typechain",
+    "build": "npm run build:contracts && npm run build:frontend",
+    "run": "cd ./frontend && npx http-server -p 3000"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^5.0.2",
