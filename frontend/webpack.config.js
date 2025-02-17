@@ -8,6 +8,9 @@ module.exports = {
   },
   resolve: {
     extensions: [".ts", ".js"],
+    alias: {
+      process: "process/browser",
+    },
   },
   module: {
     rules: [

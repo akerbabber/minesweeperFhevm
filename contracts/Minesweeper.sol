@@ -139,12 +139,11 @@ contract Minesweeper is SepoliaZamaFHEVMConfig, SepoliaZamaGatewayConfig, Gatewa
     }
 
     function getNumberSurroundingMines(euint8 surroundingCells) internal returns (euint8) {
-        // Initialize encrypted result as 0 (pseudo-code; adjust with actual TFHE method)
+        // Initialize encrypted result as 0
         euint8 numberOfSurroundingMines = TFHE.asEuint8(0);
         for (uint8 i = 0; i < 8; i++) {
-            // Extract the neighbor bit encrypted, similar to pickMine.
-            euint8 neighborBit = TFHE.asEuint8(TFHE.asEbool(TFHE.shr(surroundingCells, i)));
-            // Add the neighbor bit to the numberOfSurroundingMines result.
+            // Extract the bit in position i using an AND with 1 after shifting
+            euint8 neighborBit = TFHE.and(TFHE.shr(surroundingCells, i), TFHE.asEuint8(1));
             numberOfSurroundingMines = TFHE.add(numberOfSurroundingMines, neighborBit);
         }
         return numberOfSurroundingMines;
