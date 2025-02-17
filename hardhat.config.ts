@@ -10,8 +10,6 @@ import CustomProvider from "./CustomProvider";
 // Adjust the import path as needed
 import "./tasks/accounts";
 import "./tasks/etherscanVerify";
-import "./tasks/mintMyConfidentialERC20";
-import { setCodeMocked } from "./test/mockedSetup";
 
 extendProvider(async (provider) => {
   const newProvider = new CustomProvider(provider);
@@ -66,7 +64,7 @@ task("coverage").setAction(async (taskArgs, hre, runSuper) => {
 task("test", async (_taskArgs, hre, runSuper) => {
   // Run modified test task
   if (hre.network.name === "hardhat") {
-    await setCodeMocked(hre);
+    // await setCodeMocked(hre);
   }
   await runSuper();
 });

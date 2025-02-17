@@ -39,8 +39,10 @@ contract Minesweeper is SepoliaZamaFHEVMConfig, SepoliaZamaGatewayConfig, Gatewa
     }
 
     function generateBoard() public {
-        // Generate a random seed
-        hiddenBoard = TFHE.randEuint256();
+        // Generate a random board by using AND operation to lower the probability of mines
+        euint256 firstGen = TFHE.randEuint256();
+        euint256 secondGen = TFHE.randEuint256();
+        hiddenBoard = TFHE.and(firstGen, secondGen);
         TFHE.allowThis(hiddenBoard);
     }
 
