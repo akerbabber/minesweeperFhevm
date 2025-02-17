@@ -8,18 +8,23 @@ This project demonstrates a Minesweeper game where mine positions and hints are 
 
 ## Installation
 
+- Setup the env
+```bash
+cp .env.example .env
+```
+
 - Install dependencies:  
 ```bash
-  npm install
-  ```
+npm install
+```
 
 - Compile contracts and bundle the frontend:  
 ```bash
-  npm run build
+npm run build
 ```
 - Run the frontend
 ```bash
-  npm run run
+npm run run
 ```
 ## Usage
 
